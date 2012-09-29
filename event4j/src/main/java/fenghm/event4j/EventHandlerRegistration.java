@@ -6,5 +6,7 @@
 package fenghm.event4j;
 
 public interface EventHandlerRegistration {
+	
 	<E extends Event,H> void addEventHandler(EventType<E,H> eventType,H handler);
+	
 }
