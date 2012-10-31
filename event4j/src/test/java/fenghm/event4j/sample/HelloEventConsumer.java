@@ -10,9 +10,11 @@ import fenghm.event4j.EventManager;
 public class HelloEventConsumer implements HelloEventHandler {
 	
 	private HelloEvent lastEvent;
+	private HelloEventGroupHandler groupHandler = new HelloEventGroupHandler();
 
 	public HelloEventConsumer(EventManager eventManager){
 		eventManager.getEventHandlerRegistration().addEventHandler(HelloEvent.TYPE, this);
+		eventManager.getEventHandlerRegistration().addGroupHandler(HelloEvent.GROUP,groupHandler);
 	}
 
 	public void onHello(HelloEvent event) {
@@ -22,5 +24,9 @@ public class HelloEventConsumer implements HelloEventHandler {
 
 	public HelloEvent getLastEvent() {
 		return lastEvent;
+	}
+
+	public HelloEventGroupHandler getGroupHandler() {
+		return groupHandler;
 	}
 }

@@ -8,6 +8,6 @@ package fenghm.event4j;
 
 public interface EventTypeRegistration {
 	
-	<E extends Event,H> void addEventType(EventType<E, H> eventType);
+	<E extends Event,TH,GH> void addEventType(EventType<E,TH,GH> eventType);
 	
 }

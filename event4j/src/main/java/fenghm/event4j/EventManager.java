@@ -9,5 +9,5 @@ public interface EventManager {
 	
 	EventHandlerRegistration getEventHandlerRegistration();
 	
-	<E extends Event,H> void fireEvent(EventType<E, H> eventType,E event);
+	<E extends Event,TH,GH> void fireEvent(EventType<E,TH,GH> eventType,E event);
 }

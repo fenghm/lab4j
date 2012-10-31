@@ -5,8 +5,10 @@
  */
 package fenghm.event4j;
 
-public interface EventType<E extends Event,H> {
+public interface EventType<E extends Event,TH,GH> {
 	
-	void fire(E event,EventHandlers<H> handlers);
+	EventTypeGroup<GH> group();
+	
+	void fire(E event,EventHandlers<TH> handlers,EventHandlers<GH> groupHandlers);
 	
 }

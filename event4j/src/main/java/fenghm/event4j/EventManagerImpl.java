@@ -19,12 +19,14 @@ public class EventManagerImpl implements EventManager {
 	
 	private static final Logger log = LoggerFactory.getLogger(EventManagerImpl.class);
 	
-    private final Map<EventType, CopyOnWriteEventHandlers> eventTypes		        = new ConcurrentHashMap<EventType, CopyOnWriteEventHandlers>();
-    private final EventTypeRegistration 				   eventTypeRegistration    = new EventTypeRegistrationImpl();
-    private final EventHandlerRegistration 				   eventHandlerRegistration = new EventHandlerRegistrationImpl();
+    private final Map<EventType, CopyOnWriteEventHandlers>      eventTypes		         = new ConcurrentHashMap<EventType, CopyOnWriteEventHandlers>();
+    private final Map<EventTypeGroup, CopyOnWriteEventHandlers> eventGroups              = new ConcurrentHashMap<EventTypeGroup, EventManagerImpl.CopyOnWriteEventHandlers>();
 
-	public <E extends Event, H> void fireEvent(EventType<E, H> eventType, E event) {
-		eventType.fire(event, eventTypes.get(eventType));
+    private final EventTypeRegistration 				        eventTypeRegistration    = new EventTypeRegistrationImpl();
+    private final EventHandlerRegistration 				        eventHandlerRegistration = new EventHandlerRegistrationImpl();
+
+	public <E extends Event,TH,GH> void fireEvent(EventType<E, TH,GH> eventType, E event) {
+		eventType.fire(event, eventTypes.get(eventType),eventGroups.get(eventType.group()));
 	}
 	
 	public EventTypeRegistration getEventTypeRegistration() {
@@ -36,17 +38,29 @@ public class EventManagerImpl implements EventManager {
 	}
 
 	private final class EventTypeRegistrationImpl implements EventTypeRegistration {
-		public <E extends Event, H> void addEventType(EventType<E, H> eventType) {
+		public <E extends Event,TH,GH> void addEventType(EventType<E,TH,GH> eventType) {
 			Assert.notNull(eventType);
+			Assert.notNull(eventType.group());
 	        Assert.isFalse(eventTypes.containsKey(eventType),"event type '{0}' aleady registered",eventType);
-	        eventTypes.put(eventType, new CopyOnWriteEventHandlers<H>());
+	        eventTypes.put(eventType, new CopyOnWriteEventHandlers<TH>());
+	        
+	        CopyOnWriteEventHandlers<GH> groupHandlers = eventGroups.get(eventType.group());
+	        if(null == groupHandlers){
+	        	eventGroups.put(eventType.group(), new CopyOnWriteEventHandlers());
+	        }
         }
 	}
 	
 	private final class EventHandlerRegistrationImpl implements EventHandlerRegistration {
-		public <E extends Event, H> void addEventHandler(EventType<E, H> eventType, H handler) {
-			CopyOnWriteEventHandlers<H> handlers = eventTypes.get(eventType);
+		public <E extends Event,TH,GH> void addEventHandler(EventType<E,TH,GH> eventType,TH handler) {
+			CopyOnWriteEventHandlers<TH> handlers = eventTypes.get(eventType);
 			Assert.notNull(handlers,"event type '{0}' did not registered,cannot add event handler",eventType);
+			handlers.add(handler);
+        }
+
+		public <H> void addGroupHandler(EventTypeGroup<H> group, H handler) {
+			CopyOnWriteEventHandlers<H> handlers = eventGroups.get(group);
+			Assert.notNull(handlers,"event type group '{0}' did not registered,cannot add event handler",eventGroups);
 			handlers.add(handler);
         }
 	}

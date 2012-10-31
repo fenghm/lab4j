@@ -7,6 +7,8 @@ package fenghm.event4j;
 
 public interface EventHandlerRegistration {
 	
-	<E extends Event,H> void addEventHandler(EventType<E,H> eventType,H handler);
+	<E extends Event,TH,GH> void addEventHandler(EventType<E,TH,GH> eventType,TH handler);
+	
+	<H> void addGroupHandler(EventTypeGroup<H> group,H handler);
 	
 }

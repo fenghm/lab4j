@@ -20,6 +20,9 @@ public class HelloEventTest extends Assert{
 		HelloEvent event = consumer.getLastEvent();
 		assertNotNull(event);
 		assertEquals("hi, can you hear me?", event.getMessage());
+		
+		assertSame(HelloEvent.TYPE, consumer.getGroupHandler().getLastEventType());
+		assertSame(event,consumer.getGroupHandler().getLastEvent());
 	}
 
 }
